@@ -25,14 +25,22 @@ public class SessionMemoryImpl implements Session {
     private final Map<String, Channel> deviceChannelMap = new ConcurrentHashMap<>();
 
     @Override
-    public void bind(Channel channel, String deviceId) {
+    public int bind(Channel channel, String deviceId) {
+        int flag = 0;
         channel.attr(AttributeKeyUtils.getDeviceid()).set(deviceId);
         Channel ch = deviceChannelMap.putIfAbsent(deviceId, channel);
-        if (ch != null) {
-            log.error("===========================设备[{}]已新建连接，断开旧连接：[{}]", deviceId, ch.id());
+
+        if (ch == null) {
+            flag = 1;
+        }
+
+        if (ch != null && ch != channel) {
+            log.error("===========================设备[{}]已新建连接[{}]，断开旧连接：[{}]", deviceId, ch.id(), channel.id());
             ch.close();
             deviceChannelMap.put(deviceId, channel);
+            flag = 1;
         }
+        return flag;
     }
 
     @Override
