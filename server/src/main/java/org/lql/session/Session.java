@@ -25,7 +25,7 @@ public interface Session {
      * @param deviceId 会话绑定设备id
      * @return void
      */
-    void bind(Channel channel, String deviceId);
+    int bind(Channel channel, String deviceId);
 
     /**
      * description: 解绑会话 <br>
